@@ -461,7 +461,149 @@ function clearSearch(type){
 }
 
 
-function toggleFullscreen(containerId){
+
+// وضع الأندرويد - يحاكي سلوك الايفون: مشغل النظام الأساسي يمنع الإعلانات
+let nativeMode = false;
+
+async function playInNativeAndroidMode(tmdbId, type='movie', season=1, episode=1){
+  const frame = document.getElementById('video-frame');
+  frame.innerHTML = `
+    <div class="player-container" id="player-container" style="background:#000">
+      <video id="nativeVideo" controls playsinline webkit-playsinline preload="auto" style="width:100%;aspect-ratio:16/9;background:#000"></video>
+      <div class="player-controls" style="justify-content:space-between">
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="fs-btn" onclick="toggleFullscreen('nativeVideo')">⛶ ملء الشاشة - وضع النظام (يمنع الإعلانات)</button>
+          <span style="font-size:9px;color:#4ade80">🤖 وضع الأندرويد النظيف</span>
+        </div>
+        <button class="fs-btn" style="background:#222" onclick="playInIframeMode('${tmdbId}','${type}',${season},${episode})">↩ عودة للوضع العادي</button>
+      </div>
+      <div id="native-status" style="padding:10px;text-align:center;color:#888;font-size:11px">⏳ جاري استخراج رابط الفيديو المباشر...</div>
+    </div>
+  `;
+
+  const video = document.getElementById('nativeVideo');
+  const status = document.getElementById('native-status');
+  
+  try{
+    // محاولة استخراج الرابط المباشر من VidLink API عبر proxy
+    // VidLink API الحقيقي
+    const apiUrl = type==='movie' 
+      ? `https://vidlink.pro/api/b/movie/${tmdbId}`
+      : `https://vidlink.pro/api/b/tv/${tmdbId}/${season}/${episode}`;
+    
+    // استخدام CORS proxy مجاني
+    const proxies = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`,
+      `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`
+    ];
+
+    let data = null;
+    for(let proxyUrl of proxies){
+      try{
+        const res = await fetch(proxyUrl, {headers:{'Accept':'application/json'}});
+        if(res.ok){
+          const text = await res.text();
+          try{ data = JSON.parse(text); } catch(e){ 
+            // أحياناً يرجع HTML فيه JSON
+            const match = text.match(/\{[\s\S]*\}/);
+            if(match) data = JSON.parse(match[0]);
+          }
+          if(data) break;
+        }
+      }catch(e){ console.log('proxy fail', proxyUrl); }
+    }
+
+    // إذا فشل الـ API، جرب طريقة ثانية: استخراج m3u8 من صفحة الفيديو مباشرة
+    if(!data || !data.stream){
+      status.innerHTML = `⚠️ تعذر استخراج الرابط المباشر تلقائياً<br><span style="font-size:10px">سأحاول تشغيل المشغل الأصلي بوضع ملء الشاشة النظامي</span>`;
+      // Fallback: استخدم iframe لكن بملء شاشة الفيديو نفسه (يفرض مشغل النظام في بعض أجهزة أندرويد)
+      setTimeout(()=>{
+        frame.innerHTML = `
+          <div class="player-container" id="player-container">
+            <iframe id="main-iframe" src="https://vidlink.pro/movie/${tmdbId}?primaryColor=e50914&autoPlay=true&nativeFullscreen=true" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture; native-fullscreen" referrerpolicy="no-referrer" style="width:100%;aspect-ratio:16/9"></iframe>
+            <div class="player-controls">
+              <button class="fs-btn" onclick="forceNativeFullscreen()">⛶ فرض ملء الشاشة النظامي (يمنع الإعلانات)</button>
+            </div>
+            <p style="font-size:10px;color:#666;padding:8px;text-align:center">في الأندرويد: اضغط ملء الشاشة داخل الفيديو نفسه (أيقونة ⛶ داخل المشغل) وليس زر الموقع - هذا يجبر الأندرويد يستخدم المشغل الأساسي مثل الايفون</p>
+          </div>
+        `;
+      }, 1500);
+      return;
+    }
+
+    // إذا نجح استخراج الرابط
+    let hlsUrl = data.stream || data.source || data.url;
+    if(data.stream && typeof data.stream === 'object' && data.stream.url) hlsUrl = data.stream.url;
+    if(Array.isArray(data.streams) && data.streams[0]) hlsUrl = data.streams[0].url || data.streams[0];
+
+    status.innerHTML = `✅ تم العثور على الرابط - جاري التشغيل بالمشغل الأساسي...`;
+
+    if(hlsUrl){
+      if(Hls.isSupported()){
+        const hls = new Hls();
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, ()=>{
+          video.play();
+          status.style.display='none';
+          // فرض ملء الشاشة النظامي تلقائياً بعد ثانيتين (اختياري)
+          setTimeout(()=>{
+            if(confirm('هل تريد تفعيل ملء الشاشة النظامي الآن لمنع الإعلانات تماماً؟ (مثل الايفون)')){
+              toggleFullscreen('nativeVideo');
+            }
+          }, 2000);
+        });
+      } else if(video.canPlayType('application/vnd.apple.mpegurl')){
+        video.src = hlsUrl;
+        video.play();
+        status.style.display='none';
+      }
+    }
+
+  }catch(err){
+    console.error(err);
+    status.innerHTML = `❌ فشل الاستخراج: ${err.message}<br><button onclick="playInIframeMode('${tmdbId}','${type}',${season},${episode})" style="margin-top:8px;background:var(--primary);color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer">العودة للوضع العادي</button>`;
+  }
+}
+
+function playInIframeMode(tmdbId, type, season, episode){
+ const frame = document.getElementById('video-frame');
+ const url = type==='movie' ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=e50914` : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=e50914`;
+ frame.innerHTML = `
+   <div class="player-container" id="player-container">
+     <iframe id="main-iframe" src="${url}" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="no-referrer"></iframe>
+     <div class="player-controls">
+       <button class="fs-btn" onclick="toggleFullscreen('player-container')">⛶ ملء الشاشة</button>
+       <button class="fs-btn" style="background:#1a3a1a;border-color:#2a5a2a" onclick="playInNativeAndroidMode('${tmdbId}','${type}',${season},${episode})">🤖 تفعيل وضع الأندرويد بدون إعلانات</button>
+     </div>
+   </div>
+ `;
+}
+
+function forceNativeFullscreen(){
+ const iframe = document.getElementById('main-iframe');
+ if(!iframe) return;
+ // محاولة فرض الفل سكرين على الفيديو داخل الـ iframe عبر رسالة
+ try{
+   iframe.requestFullscreen();
+ }catch(e){
+   alert('في الأندرويد: داخل الفيديو نفسه، اضغط على أيقونة ملء الشاشة ⛶ الصغيرة الموجودة داخل مشغل الفيديو (وليس زر الموقع). هذا يجبر الأندرويد على استخدام المشغل الأساسي ويمنع الإعلانات مثل الايفون تماماً.');
+ }
+}
+
+function toggleFullscreen(elemId){
+ const elem = document.getElementById(elemId);
+ if(!elem) return;
+ if(!document.fullscreenElement){
+   if(elem.requestFullscreen) elem.requestFullscreen().catch(()=>{});
+   else if(elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+   else if(elem.webkitEnterFullscreen) elem.webkitEnterFullscreen(); // iOS
+ } else {
+   if(document.exitFullscreen) document.exitFullscreen();
+ }
+}
+
+function toggleFullscreen_old_unused(containerId){
  const elem=document.getElementById(containerId);
  if(!elem) return;
  if(!document.fullscreenElement){
