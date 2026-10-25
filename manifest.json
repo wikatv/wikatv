@@ -1,13 +1,13 @@
 {
-  "name": "WIKA TV",
-  "short_name": "WIKA TV",
-  "description": "WIKA TV - منصة أفلام ومسلسلات وقنوات",
+  "name": "Wika Tv",
+  "short_name": "Wika Tv",
+  "description": "Wika Tv - منصة أفلام ومسلسلات وقنوات",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#000000",
-  "theme_color": "#e50914",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "logo.png",
