@@ -1,0 +1,107 @@
+/* WIKA TV - V8 - Style Sheet */
+
+:root{--primary:#e50914;--bg:#0b0b0b;--card:#1a1a1a;--text:#fff;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Tahoma,sans-serif;overflow-x:hidden}
+
+/* LANDING - بنفس ألوان المنصة */
+#landing-page{position:fixed;inset:0;z-index:20000;background:var(--bg);overflow-y:auto;display:block;}
+#landing-hero{position:relative;height:68vh;min-height:500px;overflow:hidden;background:#000}
+#landing-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:all .8s ease;filter:brightness(0.6)}
+#landing-gradient{position:absolute;inset:0;background:linear-gradient(0deg, var(--bg) 0%, var(--bg) 15%, rgba(11,11,11,0.2) 55%, rgba(0,0,0,0.7) 100%); border-bottom:2px solid var(--primary);}
+#landing-nav{position:absolute;top:0;left:0;right:0;padding:18px 4%;display:flex;justify-content:space-between;align-items:center;z-index:2;}
+.logo-main{font-size:30px;font-weight:900;letter-spacing:1px;color:var(--primary);text-shadow:0 0 15px rgba(229,9,20,0.5)}
+.logo-main span{color:#fff}
+.tagline{position:absolute;bottom:28%;left:5%;right:5%;z-index:2;}
+.tagline h1{font-size:40px;font-weight:900;line-height:1.1;margin-bottom:10px;text-shadow:0 2px 10px rgba(0,0,0,.8);}
+.tagline h1 em{color:var(--primary);font-style:normal}
+.tagline p{font-size:14px;color:#aaa;max-width:500px;line-height:1.6}
+
+/* تبويبات فقط - تصميم احترافي بألوان المنصة */
+.tabs-landing{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:22px 4%;position:relative;z-index:3;margin-top:-70px;}
+.tab-card{position:relative;height:185px;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid #222;transition:all .35s;background:var(--card);}
+.tab-card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 15px 35px rgba(229,9,20,0.2);}
+.tab-card-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.45;transition:.4s}
+.tab-card:hover .tab-card-bg{opacity:.65;transform:scale(1.05)}
+.tab-card-overlay{position:absolute;inset:0;background:linear-gradient(0deg, rgba(0,0,0,.95) 0%, rgba(0,0,0,.25) 100%);}
+.tab-card-content{position:absolute;bottom:0;left:0;right:0;padding:16px;z-index:1}
+.tab-card-icon{font-size:26px;margin-bottom:4px}
+.tab-card-title{font-size:17px;font-weight:800;margin-bottom:2px}
+.tab-card-sub{font-size:11px;color:#999}
+
+/* سلايدر بسيط */
+.slider-section{padding:12px 0 35px 0;background:var(--bg);border-top:1px solid #111}
+.slider-head{padding:0 4%;margin-bottom:12px;display:flex;justify-content:space-between}
+.slider-head h3{font-size:13px;font-weight:800;color:#fff}
+.best-slider{display:flex;gap:10px;overflow-x:auto;padding:0 4% 10px 4%;scrollbar-width:none}
+.best-slider::-webkit-scrollbar{display:none}
+.best-card{flex:0 0 125px;cursor:pointer;transition:.2s}
+.best-card:hover{transform:scale(1.04)}
+.best-card img{width:100%;height:185px;object-fit:cover;border-radius:10px;border:2px solid #1a1a1a;display:block}
+.best-card-title{font-size:10px;font-weight:600;margin-top:5px;text-align:center;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* APP CONTAINER - كل تبويب مستقل */
+#app-container{display:none}
+.app-header{background:rgba(0,0,0,0.95);padding:12px 4%;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--primary);position:sticky;top:0;z-index:1000}
+.app-header .logo{color:var(--primary);font-size:22px;font-weight:900;cursor:pointer}
+.app-header .back-btn{background:#1a1a1a;border:1px solid #333;color:#fff;padding:7px 16px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;transition:.2s}
+.app-header .back-btn:hover{background:var(--primary);border-color:var(--primary)}
+.app-title{font-size:16px;font-weight:800}
+.app-title.movies{color:#fff}
+.app-title.tvshows{color:#fff}
+.app-title.tv{color:#fff}
+
+
+.search-wrapper{position:relative;width:92%;max-width:500px;margin:14px auto;display:flex;align-items:center;background:#161616;border:1px solid #2a2a2a;border-radius:14px;padding:0 14px;transition:all .25s}
+.search-wrapper:focus-within{border-color:var(--primary);background:#1e1e1e;box-shadow:0 0 0 3px rgba(229,9,20,0.15);}
+.search-icon{font-size:14px;color:#666;flex-shrink:0}
+.search-input{flex:1;background:transparent;border:none;outline:none;color:#fff;padding:12px 10px;font-size:13px;text-align:right}
+.search-input::placeholder{color:#666}
+.search-clear{font-size:12px;color:#555;cursor:pointer;display:none;padding:4px 8px;border-radius:8px;background:#222}
+.search-clear.show{display:block}
+.search-wrapper.has-value .search-clear.show{display:block}
+
+
+.filter-section{background:#000;padding:8px 0;border-bottom:1px solid #222;width:100%}
+.filter-bar{display:flex;gap:8px;overflow-x:auto;padding:0 4% 8px 4%;scrollbar-width:none}
+.filter-btn{background:#1a1a1a;color:#ccc;border:1px solid #333;padding:6px 14px;border-radius:12px;cursor:pointer;white-space:nowrap;font-size:11px;transition:.2s}
+.filter-btn.active{color:var(--primary);border-color:var(--primary);background:#250505}
+.movie-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:14px;padding:15px 4%;width:92%;margin:0 auto}
+.movie-card{background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid #222;position:relative;transition:.2s}
+.movie-card:hover{border-color:#333;transform:scale(1.02)}
+.movie-card img{width:100%;height:200px;object-fit:cover;display:block}
+.movie-info{padding:8px;text-align:center;font-size:11px;font-weight:700;height:35px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.badge{position:absolute;top:6px;right:6px;background:var(--primary);color:#fff;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:800;z-index:2}
+.badge.live{background:#00c853}
+
+#details-page,#player-page{display:none;position:fixed;inset:0;background:var(--bg);z-index:10000;overflow-y:auto}
+.close-btn{position:fixed;top:20px;left:20px;background:var(--primary);color:#fff;border:2px solid #fff;width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:10001;font-weight:bold;font-size:16px}
+.server-bar{display:flex;gap:6px;overflow-x:auto;background:#111;padding:10px;justify-content:center;border-bottom:1px solid #333}
+.episodes-container{padding:15px 5%;background:#000;border-top:1px solid #333}
+.episode-list{display:grid;grid-template-columns:repeat(auto-fill, minmax(75px, 1fr));gap:8px}
+.ep-btn{background:#1a1a1a;border:1px solid #333;color:#fff;padding:10px;border-radius:5px;text-align:center;cursor:pointer;font-size:11px}
+.ep-btn.active{background:var(--primary)}
+iframe,video{width:100%;aspect-ratio:16/9;border:none;background:#000}
+.btn-action{background:var(--primary);color:#fff;border:none;padding:12px 35px;border-radius:25px;cursor:pointer;font-weight:bold;font-size:14px}
+
+@media(max-width:600px){
+.tabs-landing{grid-template-columns:1fr;gap:12px}
+.tab-card{height:135px}
+.tagline h1{font-size:30px}
+.movie-grid{grid-template-columns:repeat(2, 1fr)}
+}
+
+.player-container{position:relative;background:#000;border-radius:0;overflow:hidden}
+.player-controls{display:flex;align-items:center;justify-content:flex-end;padding:8px 12px;background:#0f0f0f;border-top:1px solid #1a1a1a;gap:8px}
+.fs-btn{background:#1a1a1a;border:1px solid #333;color:#fff;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:700;transition:.2s}
+.fs-btn:hover{background:var(--primary);border-color:var(--primary)}
+#main-iframe:fullscreen, .player-container:fullscreen{width:100vw;height:100vh}
+#main-iframe:fullscreen{aspect-ratio:auto}
+
+
+    <style>
+    .wika-logo-header{display:flex;align-items:center;gap:10px}
+    .wika-logo-header img{width:42px;height:42px;border-radius:50%;object-fit:cover;box-shadow:0 0 10px rgba(229,9,20,0.4)}
+    .wika-logo-header span{font-weight:900;font-size:18px;letter-spacing:1px;color:#fff}
+    .wika-logo-header span b{color:var(--primary)}
+    

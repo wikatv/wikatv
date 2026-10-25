@@ -1,22 +1,15 @@
+
 {
-  "name": "Wika Cinema",
-  "short_name": "Wika",
-  "description": "شاهد أفضل الأفلام والمسلسلات",
-  "start_url": "/My-cinema-/",
-  "scope": "/My-cinema-/",
+  "name": "WIKA TV",
+  "short_name": "WIKA TV",
+  "description": "منصة WIKA TV لمشاهدة الأفلام والمسلسلات والقنوات",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0b0b0b",
+  "background_color": "#000000",
   "theme_color": "#e50914",
-  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://i.ibb.co/zTr7jm5M/Picsart-26-01-16-01-39-26-682.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://i.ibb.co/zTr7jm5M/Picsart-26-01-16-01-39-26-682.png",
+      "src": "logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
