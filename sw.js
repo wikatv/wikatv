@@ -1,35 +1,56 @@
-const CACHE_NAME = 'wika-cinema-v3';
-const assets = [
-    '/My-cinema-/',
-    '/My-cinema-/index.html',
-    '/My-cinema-/manifest.json',
-    'https://i.ibb.co/zTr7jm5M/Picsart-26-01-16-01-39-26-682.png'
+// WIKA TV - Service Worker v8.1 - Updated 2025
+const CACHE_NAME = 'wika-tv-v8-1-' + new Date().toISOString().slice(0,10);
+const urlsToCache = [
+  './',
+  './index.html',
+  './style.css',
+  './script.js',
+  './logo.png',
+  './manifest.json'
 ];
 
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(assets);
-        })
-    );
-    self.skipWaiting();
+// تثبيت النسخة الجديدة
+self.addEventListener('install', event => {
+  console.log('WIKA TV SW: Installing new version');
+  self.skipWaiting(); // فرض التحديث فوراً
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
 });
 
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((keys) => {
-            return Promise.all(
-                keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-            );
+// تفعيل - مسح كل الكاش القديم
+self.addEventListener('activate', event => {
+  console.log('WIKA TV SW: Activating and cleaning old caches');
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME && cacheName.includes('wika')) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
         })
-    );
-    return self.clients.claim();
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-        })
-    );
+// جلب الملفات - حاول الشبكة أولاً ثم الكاش
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        // إذا نجح جلب من الشبكة، حدث الكاش
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseClone);
+        });
+        return response;
+      })
+      .catch(() => {
+        // إذا فشلت الشبكة، جرب الكاش
+        return caches.match(event.request);
+      })
+  );
 });
