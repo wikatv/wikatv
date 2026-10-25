@@ -1,4 +1,3 @@
-// WIKA TV - V8 - Main Script
 
 (function(){ const o=window.open; window.open=function(){ return null; }; })();
 const API_KEY='243d3178406656f0f1ceb1fde181815e';
@@ -234,4 +233,3 @@ window.addEventListener('message', (e)=>{
 });
 
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
-
